@@ -1,0 +1,2 @@
+[console_scripts]
+prompt-scan = cli:entry

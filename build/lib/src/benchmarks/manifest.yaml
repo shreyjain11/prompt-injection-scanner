@@ -1,0 +1,120 @@
+version: "1.0"
+
+suites:
+  python_core:
+    description: "Core Python vulnerabilities: direct concat, unsafe functions, templates"
+    cases:
+      - id: py_direct_concat
+        language: python
+        label: vulnerable
+        code: |
+          import openai
+          def f(user_input):
+              prompt = "You are a helpful assistant. " + user_input
+              return prompt
+      - id: py_messages_safe
+        language: python
+        label: secure
+        code: |
+          import openai
+          def f(user_input):
+              messages = [
+                {"role":"system","content":"You are a helpful assistant."},
+                {"role":"user","content":user_input}
+              ]
+              return messages
+      - id: py_eval
+        language: python
+        label: vulnerable
+        code: |
+          def f(expr):
+              return eval(expr)
+      - id: py_logging
+        language: python
+        label: secure
+        code: |
+          import logging
+          def f(user_input):
+              logging.info(f"User said: {user_input}")
+              return 1
+      - id: py_docstring_safe
+        language: python
+        label: secure
+        code: |
+          def help_text():
+              """
+              You are a helpful assistant. This is documentation text only
+              and should not be treated as a live prompt.
+              """
+              return "ok"
+      - id: py_prompt_concat_into_api
+        language: python
+        label: vulnerable
+        code: |
+          import openai
+          def f(user_input):
+              prompt = "You are a helpful assistant. " + user_input
+              return openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                  {"role":"system","content":"Follow instructions."},
+                  {"role":"user","content": prompt}
+                ]
+              )
+      - id: py_template_render_safe
+        language: python
+        label: secure
+        code: |
+          from jinja2 import Template
+          def f(user_input):
+              # Render to HTML, not sent to an LLM
+              t = Template("<p>{{ user }}</p>")
+              return t.render(user=user_input)
+
+  javascript_core:
+    description: "Core JS vulnerabilities: template literals to prompts, eval"
+    cases:
+      - id: js_template_prompt
+        language: javascript
+        label: vulnerable
+        code: |
+          const userInput = 'hi';
+          const prompt = `You are a helpful assistant. ${userInput}`;
+      - id: js_console_log
+        language: javascript
+        label: secure
+        code: |
+          const userInput = 'hi';
+          console.log(`User said: ${userInput}`);
+      - id: js_eval
+        language: javascript
+        label: vulnerable
+        code: |
+          const result = eval(userCode);
+      - id: js_openai_messages_vuln
+        language: javascript
+        label: vulnerable
+        code: |
+          import OpenAI from "openai";
+          const client = new OpenAI();
+          const userInput = 'hello';
+          const resp = await client.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [
+              { role: 'system', content: 'Follow instructions' },
+              { role: 'user', content: `You are a helpful assistant. ${userInput}` }
+            ]
+          });
+      - id: js_template_literal_safe
+        language: javascript
+        label: secure
+        code: |
+          const name = 'Reader';
+          const readme = `# Welcome, ${name}\nThis README explains usage.`;
+          function show() { return readme; }
+
+metrics:
+  report:
+    - precision
+    - recall
+    - f1
