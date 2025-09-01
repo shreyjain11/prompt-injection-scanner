@@ -12,6 +12,9 @@ module.exports = {
         foreground: '#000000',
         background: '#ffffff',
       },
+      animation: {
+        aurora: "aurora 60s linear infinite",
+      },
     },
   },
   plugins: [require('@tailwindcss/forms')],
