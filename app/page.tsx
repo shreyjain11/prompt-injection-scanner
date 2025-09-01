@@ -39,11 +39,8 @@ export default function HomePage() {
 
   const rows = useMemo(() => {
     const r: Array<{ file: string; severity: string; message: string; line: string; confidence?: number }> = [];
-    console.log('Processing data:', data); // Debug log
     for (const item of data?.results || []) {
-      console.log('Processing item:', item); // Debug log
       for (const f of item.findings || []) {
-        console.log('Processing finding:', f); // Debug log
         r.push({
           file: item.file_path,
           severity: (f.severity || 'unknown').toUpperCase(),
@@ -53,7 +50,6 @@ export default function HomePage() {
         });
       }
     }
-    console.log('Final rows:', r); // Debug log
     return r;
   }, [data]);
 
@@ -111,7 +107,6 @@ export default function HomePage() {
       for (const a of attempts) {
         try {
           const json = await tryRequest(a.url, a.init);
-          console.log('API Response:', json); // Debug log
           setData(json);
           return;
         } catch (e: any) { lastError = e; }
@@ -161,42 +156,115 @@ export default function HomePage() {
         <div className="grid grid-cols-1 gap-6">
           {/* Summary card */}
           <div className="border border-black bg-white text-black p-6 rounded-2xl">
-            <div className="text-md font-semibold uppercase">Summary</div>
+            <div className="flex items-center gap-2 mb-4">
+              <Shield className="w-5 h-5"/>
+              <div className="text-md font-semibold uppercase">Scan Summary</div>
+            </div>
             <div className="mt-2">
               {data?.summary ? (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <Stat label="Files" value={`${data.summary.scanned_files ?? 0}/${data.summary.total_files ?? 0}`} />
-                  <Stat label="Findings" value={`${data.summary.total_findings ?? 0}`} />
-                  <Stat label="Duration" value={`${data.summary.scan_duration ?? 0}s`} />
-                  <Stat label="Status" value={loading ? 'Scanning' : data ? 'Complete' : 'Idle'} />
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <StatCard 
+                    icon="📊" 
+                    label="Files Scanned" 
+                    value={`${data.summary.scanned_files ?? 0}`}
+                    subtitle={`of ${data.summary.total_files ?? 0} total`}
+                  />
+                  <StatCard 
+                    icon={rows.length > 0 ? "⚠️" : "✅"} 
+                    label="Security Issues" 
+                    value={`${data.summary.total_findings ?? 0}`}
+                    subtitle={rows.length > 0 ? "found" : "clean"}
+                  />
+                  <StatCard 
+                    icon="⏱️" 
+                    label="Scan Time" 
+                    value={`${data.summary.scan_duration ?? 0}s`}
+                    subtitle="completed"
+                  />
+                  <StatCard 
+                    icon={loading ? "🔄" : data ? "✅" : "⏸️"} 
+                    label="Status" 
+                    value={loading ? 'Scanning' : data ? 'Complete' : 'Ready'}
+                    subtitle={loading ? "in progress" : data ? "finished" : "to scan"}
+                  />
                 </div>
               ) : (
-                <div className="text-sm">No results yet. Paste a GitHub URL and run a scan.</div>
+                <div className="text-center py-8">
+                  <div className="text-4xl mb-2">🚀</div>
+                  <div className="text-sm text-gray-600">Ready to scan! Paste a GitHub URL above.</div>
+                </div>
               )}
             </div>
           </div>
 
-          {/* Findings grouped by severity */}
+          {/* Findings - Beautiful Cards */}
           <div className="border border-black bg-white text-black p-6 rounded-2xl">
-            <div className="text-md font-semibold uppercase">Findings</div>
-            {!rows.length && <div className="mt-2 text-sm">No findings.</div>}
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-md font-semibold uppercase">Security Findings</div>
+              <div className="text-sm text-gray-600">{rows.length} total findings</div>
+            </div>
+            
+            {!rows.length && (
+              <div className="text-center py-12">
+                <Shield className="w-16 h-16 mx-auto text-green-600 mb-4"/>
+                <div className="text-lg font-semibold text-green-600">No vulnerabilities found!</div>
+                <div className="text-sm text-gray-500 mt-1">Your repository looks secure.</div>
+              </div>
+            )}
+            
             {!!rows.length && (
-              <div className="mt-3 space-y-4">
+              <div className="space-y-6">
                 {['CRITICAL','HIGH','MEDIUM','LOW','UNKNOWN'].map(sev => {
                   const items = bySeverity[sev] || [];
                   if (!items.length) return null;
+                  
+                  const severityColors = {
+                    'CRITICAL': 'bg-red-100 border-red-500 text-red-800',
+                    'HIGH': 'bg-orange-100 border-orange-500 text-orange-800', 
+                    'MEDIUM': 'bg-yellow-100 border-yellow-500 text-yellow-800',
+                    'LOW': 'bg-blue-100 border-blue-500 text-blue-800',
+                    'UNKNOWN': 'bg-gray-100 border-gray-500 text-gray-800'
+                  };
+                  
+                  const severityIcons = {
+                    'CRITICAL': '🔴',
+                    'HIGH': '🟠', 
+                    'MEDIUM': '🟡',
+                    'LOW': '🔵',
+                    'UNKNOWN': '⚪'
+                  };
+                  
                   return (
-                    <div key={sev}>
-                      <div className="inline-block border border-black px-2 py-1 text-xs font-semibold">{sev} · {items.length}</div>
-                      <ul className="mt-2 divide-y divide-black border border-black">
+                    <div key={sev} className="space-y-3">
+                      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm ${severityColors[sev as keyof typeof severityColors]}`}>
+                        <span>{severityIcons[sev as keyof typeof severityIcons]}</span>
+                        {sev} ({items.length} findings)
+                      </div>
+                      
+                      <div className="grid gap-4">
                         {items.map((it, i) => (
-                          <li key={i} className="flex flex-wrap gap-3 p-3">
-                            <code className="bg-black text-white px-2 py-1">{it.file}:{it.line}</code>
-                            <span className="flex-1">{it.message}</span>
-                            {it.confidence != null && <span className="border border-black px-2 py-1 text-xs">c={it.confidence.toFixed(2)}</span>}
-                          </li>
+                          <div key={i} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow bg-gray-50">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <code className="bg-black text-white px-3 py-1 rounded-full text-xs font-mono">
+                                    {it.file.split('/').pop()}:{it.line}
+                                  </code>
+                                  {it.confidence != null && (
+                                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                                      {Math.round(it.confidence * 100)}% confidence
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-sm text-gray-800 leading-relaxed">{it.message}</p>
+                                <p className="text-xs text-gray-500 mt-2 font-mono truncate" title={it.file}>
+                                  📁 {it.file}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     </div>
                   );
                 })}
@@ -222,11 +290,13 @@ export default function HomePage() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function StatCard({ icon, label, value, subtitle }: { icon: string; label: string; value: string; subtitle: string }) {
   return (
-    <div className="border border-black p-3 text-center rounded-xl">
-      <div className="text-xs uppercase font-semibold">{label}</div>
-      <div className="text-xl font-extrabold">{value}</div>
+    <div className="border border-gray-200 bg-gray-50 p-4 text-center rounded-xl hover:shadow-md transition-shadow">
+      <div className="text-2xl mb-2">{icon}</div>
+      <div className="text-xs uppercase font-semibold text-gray-600 mb-1">{label}</div>
+      <div className="text-2xl font-extrabold text-gray-900">{value}</div>
+      <div className="text-xs text-gray-500">{subtitle}</div>
     </div>
   );
 }
