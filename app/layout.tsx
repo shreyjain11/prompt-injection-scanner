@@ -5,8 +5,13 @@ import type { Metadata } from 'next';
 import SiteHeader from '@/components/site/header';
 
 export const metadata: Metadata = {
-  title: 'Prompt Injection Scanner',
-  description: 'Scan public GitHub repos for prompt injection issues',
+  title: 'PromptScan - Prompt Injection Scanner',
+  description: 'Scan public GitHub repos for prompt injection vulnerabilities. Open source and free forever.',
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 const inter = Inter({ subsets: ['latin'] });
