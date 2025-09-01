@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Shield, Github, Search, Brain, ShieldCheck, Terminal, BarChart3, AlertTriangle, CheckCircle, Clock, Activity, Folder, AlertCircle, XCircle, Minus } from 'lucide-react';
 import { AuroraBackground } from '@/components/ui/aurora-background';
+import { HoverEffect } from '@/components/ui/card-hover-effect';
 
 type Finding = {
   severity?: string;
@@ -269,7 +270,7 @@ export default function HomePage() {
                       
                       <div className="grid gap-4">
                         {items.map((it, i) => (
-                          <div key={i} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow bg-gray-50">
+                          <div key={i} className="border border-gray-200 dark:border-gray-600 rounded-xl p-4 bg-gray-50 dark:bg-gray-700">
                             <div className="flex items-start justify-between gap-4">
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-2">
@@ -282,8 +283,8 @@ export default function HomePage() {
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-sm text-gray-800 leading-relaxed">{it.message}</p>
-                                <div className="flex items-center gap-1 text-xs text-gray-500 mt-2 font-mono truncate" title={it.file}>
+                                <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">{it.message}</p>
+                                <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-2 font-mono truncate" title={it.file}>
                                   <Folder className="w-3 h-3 flex-shrink-0" />
                                   <span className="truncate">{it.file}</span>
                                 </div>
@@ -301,17 +302,43 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* What it does - info cards */}
+      {/* What it does - hover effect cards */}
       <section className="mx-auto max-w-6xl px-6 pb-24">
         <h2 className="text-3xl font-extrabold tracking-tight mb-8 text-center text-gray-900 dark:text-white">What PromptScan Does</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <InfoCard icon={<Search className="w-6 h-6 text-blue-600"/>} title="Static scan of your repo" desc="Parses files, respects .gitignore, and analyzes only relevant code paths."/>
-          <InfoCard icon={<Brain className="w-6 h-6 text-purple-600"/>} title="Context‑aware heuristics" desc="Understands logging/UI contexts vs dangerous code to reduce false positives."/>
-          <InfoCard icon={<ShieldCheck className="w-6 h-6 text-green-600"/>} title="Confidence + strict" desc="Scores each finding and supports strict mode with tunable thresholds."/>
-          <InfoCard icon={<Terminal className="w-6 h-6 text-gray-600"/>} title="CLI & Web" desc="Run via prompt-scan in the terminal or paste a URL here for the same engine."/>
-          <InfoCard icon={<Shield className="w-6 h-6 text-red-600"/>} title="Language coverage" desc="Targets Python/JS/TS first, with a rules engine that's easy to extend."/>
-          <InfoCard icon={<Github className="w-6 h-6 text-gray-800"/>} title="GitHub friendly" desc="Fetches public repos over HTTPS ZIP, no tokens required for scanning."/>
-        </div>
+        <HoverEffect
+          items={[
+            {
+              title: "Static scan of your repo",
+              description: "Parses files, respects .gitignore, and analyzes only relevant code paths.",
+              link: "#"
+            },
+            {
+              title: "Context‑aware heuristics", 
+              description: "Understands logging/UI contexts vs dangerous code to reduce false positives.",
+              link: "#"
+            },
+            {
+              title: "Confidence + strict",
+              description: "Scores each finding and supports strict mode with tunable thresholds.",
+              link: "#"
+            },
+            {
+              title: "CLI & Web",
+              description: "Run via prompt-scan in the terminal or paste a URL here for the same engine.",
+              link: "#"
+            },
+            {
+              title: "Language coverage",
+              description: "Targets Python/JS/TS first, with a rules engine that's easy to extend.",
+              link: "#"
+            },
+            {
+              title: "GitHub friendly",
+              description: "Fetches public repos over HTTPS ZIP, no tokens required for scanning.",
+              link: "#"
+            }
+          ]}
+        />
       </section>
     </main>
     </div>
@@ -320,25 +347,11 @@ export default function HomePage() {
 
 function StatCard({ icon, label, value, subtitle }: { icon: React.ReactNode; label: string; value: string; subtitle: string }) {
   return (
-    <div className="border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-4 text-center rounded-xl hover:shadow-md transition-shadow">
+    <div className="border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-4 text-center rounded-xl">
       <div className="flex justify-center mb-3">{icon}</div>
       <div className="text-xs uppercase font-semibold text-gray-600 dark:text-gray-300 mb-1">{label}</div>
       <div className="text-2xl font-extrabold text-gray-900 dark:text-white">{value}</div>
       <div className="text-xs text-gray-500 dark:text-gray-400">{subtitle}</div>
-    </div>
-  );
-}
-
-function InfoCard({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
-  return (
-    <div className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 rounded-2xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
-      <div className="flex items-center gap-3 font-semibold text-gray-900 dark:text-white mb-3">
-        <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg group-hover:scale-110 transition-transform">
-          {icon}
-        </div>
-        <span className="text-lg">{title}</span>
-      </div>
-      <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{desc}</p>
     </div>
   );
 }
