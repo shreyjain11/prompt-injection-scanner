@@ -6,6 +6,7 @@ import { CheckCircle } from 'lucide-react';
 import { useState } from 'react';
 import SiteHeader from '@/components/site/header';
 import { AuroraBackground } from '@/components/ui/aurora-background';
+import { GlowingEffect } from '@/components/ui/glowing-effect';
 
 export default function CommandsPage() {
   const [copied, setCopied] = useState<string | null>(null);
@@ -135,9 +136,19 @@ export default function CommandsPage() {
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-black dark:text-white p-8 rounded-2xl shadow-sm">
-      <div className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{title}</div>
-      <div>{children}</div>
+    <div className="relative border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-black dark:text-white p-8 rounded-2xl shadow-sm overflow-hidden">
+      <GlowingEffect 
+        disabled={false}
+        proximity={100}
+        spread={30}
+        blur={2}
+        borderWidth={2}
+        className="opacity-30"
+      />
+      <div className="relative z-10">
+        <div className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{title}</div>
+        <div>{children}</div>
+      </div>
     </div>
   );
 }
