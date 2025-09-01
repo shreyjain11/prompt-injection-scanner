@@ -15,6 +15,12 @@
   }
 }
 
+/* Glowing effect CSS variables */
+:root {
+  --black: #000000;
+  --white: #ffffff;
+}
+
 /* Black & white theme */
 :root {
   --bg: #ffffff;

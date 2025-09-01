@@ -128,7 +128,7 @@ export default function HomePage() {
         <SiteHeader />
         <section className="relative z-10">
           <div className="mx-auto max-w-6xl px-6 py-32 text-center">
-            <div className="inline-block border border-black/20 dark:border-white/20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-4 py-2 text-xs font-semibold rounded-full text-black dark:text-white">Powered by heuristics</div>
+            <div className="inline-block border border-black/20 dark:border-white/20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-4 py-2 text-xs font-semibold rounded-full text-black dark:text-white">Open Source • Free Forever</div>
             <h1 className="mt-6 text-7xl font-extrabold leading-[1.05] tracking-tight bg-gradient-to-br from-black to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">PromptScan</h1>
             <p className="mt-4 text-lg max-w-2xl mx-auto text-gray-700 dark:text-gray-300 leading-relaxed">Paste a public GitHub URL and get an incredibly accurate report of potential prompt injection risks.</p>
             <div className="mt-8 flex items-center justify-center gap-4">
