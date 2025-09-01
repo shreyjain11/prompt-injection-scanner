@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Shield, Github, Search, Brain, ShieldCheck, Terminal } from 'lucide-react';
+import { Shield, Github, Search, Brain, ShieldCheck, Terminal, BarChart3, AlertTriangle, CheckCircle, Clock, Activity, Folder, AlertCircle, XCircle, Minus } from 'lucide-react';
 
 type Finding = {
   severity?: string;
@@ -164,25 +164,25 @@ export default function HomePage() {
               {data?.summary ? (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <StatCard 
-                    icon="📊" 
+                    icon={<BarChart3 className="w-6 h-6" />}
                     label="Files Scanned" 
                     value={`${data.summary.scanned_files ?? 0}`}
                     subtitle={`of ${data.summary.total_files ?? 0} total`}
                   />
                   <StatCard 
-                    icon={rows.length > 0 ? "⚠️" : "✅"} 
+                    icon={rows.length > 0 ? <AlertTriangle className="w-6 h-6 text-orange-600" /> : <CheckCircle className="w-6 h-6 text-green-600" />}
                     label="Security Issues" 
                     value={`${data.summary.total_findings ?? 0}`}
                     subtitle={rows.length > 0 ? "found" : "clean"}
                   />
                   <StatCard 
-                    icon="⏱️" 
+                    icon={<Clock className="w-6 h-6" />}
                     label="Scan Time" 
                     value={`${data.summary.scan_duration ?? 0}s`}
                     subtitle="completed"
                   />
                   <StatCard 
-                    icon={loading ? "🔄" : data ? "✅" : "⏸️"} 
+                    icon={loading ? <Activity className="w-6 h-6 animate-pulse" /> : data ? <CheckCircle className="w-6 h-6 text-green-600" /> : <Minus className="w-6 h-6" />}
                     label="Status" 
                     value={loading ? 'Scanning' : data ? 'Complete' : 'Ready'}
                     subtitle={loading ? "in progress" : data ? "finished" : "to scan"}
@@ -190,7 +190,7 @@ export default function HomePage() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <div className="text-4xl mb-2">🚀</div>
+                  <Shield className="w-12 h-12 mx-auto text-gray-400 mb-3" />
                   <div className="text-sm text-gray-600">Ready to scan! Paste a GitHub URL above.</div>
                 </div>
               )}
@@ -227,11 +227,11 @@ export default function HomePage() {
                   };
                   
                   const severityIcons = {
-                    'CRITICAL': '🔴',
-                    'HIGH': '🟠', 
-                    'MEDIUM': '🟡',
-                    'LOW': '🔵',
-                    'UNKNOWN': '⚪'
+                    'CRITICAL': <XCircle className="w-4 h-4" />,
+                    'HIGH': <AlertCircle className="w-4 h-4" />, 
+                    'MEDIUM': <AlertTriangle className="w-4 h-4" />,
+                    'LOW': <AlertTriangle className="w-4 h-4" />,
+                    'UNKNOWN': <Minus className="w-4 h-4" />
                   };
                   
                   return (
@@ -257,9 +257,10 @@ export default function HomePage() {
                                   )}
                                 </div>
                                 <p className="text-sm text-gray-800 leading-relaxed">{it.message}</p>
-                                <p className="text-xs text-gray-500 mt-2 font-mono truncate" title={it.file}>
-                                  📁 {it.file}
-                                </p>
+                                <div className="flex items-center gap-1 text-xs text-gray-500 mt-2 font-mono truncate" title={it.file}>
+                                  <Folder className="w-3 h-3 flex-shrink-0" />
+                                  <span className="truncate">{it.file}</span>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -290,10 +291,10 @@ export default function HomePage() {
   );
 }
 
-function StatCard({ icon, label, value, subtitle }: { icon: string; label: string; value: string; subtitle: string }) {
+function StatCard({ icon, label, value, subtitle }: { icon: React.ReactNode; label: string; value: string; subtitle: string }) {
   return (
     <div className="border border-gray-200 bg-gray-50 p-4 text-center rounded-xl hover:shadow-md transition-shadow">
-      <div className="text-2xl mb-2">{icon}</div>
+      <div className="flex justify-center mb-3">{icon}</div>
       <div className="text-xs uppercase font-semibold text-gray-600 mb-1">{label}</div>
       <div className="text-2xl font-extrabold text-gray-900">{value}</div>
       <div className="text-xs text-gray-500">{subtitle}</div>
