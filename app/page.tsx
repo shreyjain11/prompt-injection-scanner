@@ -39,8 +39,11 @@ export default function HomePage() {
 
   const rows = useMemo(() => {
     const r: Array<{ file: string; severity: string; message: string; line: string; confidence?: number }> = [];
+    console.log('Processing data:', data); // Debug log
     for (const item of data?.results || []) {
+      console.log('Processing item:', item); // Debug log
       for (const f of item.findings || []) {
+        console.log('Processing finding:', f); // Debug log
         r.push({
           file: item.file_path,
           severity: (f.severity || 'unknown').toUpperCase(),
@@ -50,6 +53,7 @@ export default function HomePage() {
         });
       }
     }
+    console.log('Final rows:', r); // Debug log
     return r;
   }, [data]);
 
@@ -107,6 +111,7 @@ export default function HomePage() {
       for (const a of attempts) {
         try {
           const json = await tryRequest(a.url, a.init);
+          console.log('API Response:', json); // Debug log
           setData(json);
           return;
         } catch (e: any) { lastError = e; }
