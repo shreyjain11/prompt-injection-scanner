@@ -82,66 +82,38 @@ export default function HomePage() {
     }
 
     try {
-      // 1) Primary: POST /api/scan (same origin or configured base)
-      const primary = apiBase ? `${apiBase}/api/scan` : '/api/scan';
-      try {
-        const json = await tryRequest(primary, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url })
-        });
-        setData(json);
-        return;
-      } catch {}
-
-      // 2) Fallback: GET with querystring (some deployments only support GET)
-      const getUrl = `${primary}?url=${encodeURIComponent(url)}`;
-      try {
-        const json = await tryRequest(getUrl);
-        setData(json);
-        return;
-      } catch {}
-
-      // 3) Alternate trailing slash
-      const alt = apiBase ? `${apiBase}/api/scan/` : '/api/scan/';
-      try {
-        const json = await tryRequest(alt, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url })
-        });
-        setData(json);
-        return;
-      } catch {}
-
-      // 4) GET against alt
-      const altGet = `${alt}?url=${encodeURIComponent(url)}`;
-      try {
-        const json = await tryRequest(altGet);
-        setData(json);
-        return;
-      } catch {}
-
-      // 5) Proxy route within Next.js when API_BASE is set
-      if (apiBase) {
-        try {
-          const json = await tryRequest('/api/proxy-scan', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url })
-          });
-          setData(json);
-          return;
-        } catch {}
-
-        try {
-          const json = await tryRequest(`/api/proxy-scan?url=${encodeURIComponent(url)}`);
-          setData(json);
-          return;
-        } catch {}
+      if (apiBase && !/^https?:\/\//i.test(apiBase)) {
+        throw new Error('NEXT_PUBLIC_API_BASE must include protocol, e.g., https://your-app.vercel.app');
       }
+
+      const attempts: Array<{ url: string; init?: RequestInit }> = [];
+      if (apiBase) {
+        attempts.push({ url: '/api/proxy-scan', init: { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) } });
+        attempts.push({ url: `/api/proxy-scan?url=${encodeURIComponent(url)}` });
+      }
+      attempts.push({ url: '/api/scan', init: { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) } });
+      attempts.push({ url: `/api/scan?url=${encodeURIComponent(url)}` });
+      attempts.push({ url: '/api/scan/', init: { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) } });
+      attempts.push({ url: `/api/scan/?url=${encodeURIComponent(url)}` });
+      if (apiBase) {
+        const base = apiBase.replace(/\/$/, '');
+        attempts.push({ url: `${base}/api/scan`, init: { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) } });
+        attempts.push({ url: `${base}/api/scan?url=${encodeURIComponent(url)}` });
+        attempts.push({ url: `${base}/api/scan/`, init: { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) } });
+        attempts.push({ url: `${base}/api/scan/?url=${encodeURIComponent(url)}` });
+      }
+
+      let lastError: any = null;
+      for (const a of attempts) {
+        try {
+          const json = await tryRequest(a.url, a.init);
+          setData(json);
+          return;
+        } catch (e: any) { lastError = e; }
+      }
+      throw lastError || new Error('All scan endpoints failed');
     } catch (e: any) {
-      const hint = 'The API may be unreachable in local dev. Deploy to Vercel or set NEXT_PUBLIC_API_BASE to your deployed URL.';
+      const hint = 'Check your deployed API and set NEXT_PUBLIC_API_BASE (e.g., https://your-app.vercel.app).';
       setError(`${String(e.message || e)} ${hint}`);
     } finally { setLoading(false); }
   }

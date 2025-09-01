@@ -71,18 +71,30 @@ def scan_handler():
 
     repo_dir = None
     try:
-        repo_dir = fetch_github_repo_to_dir(url)
+        # Add error handling for repo fetching
+        try:
+            repo_dir = fetch_github_repo_to_dir(url)
+        except Exception as e:
+            return jsonify({'error': f'Failed to fetch repository: {str(e)}'}), 400
 
-        scanner = PromptScanner(
-            exclude_patterns=[],
-            parallel_workers=4,
-            use_cache=False,
-            verbose=False,
-        )
-        scanner.rule_engine.min_confidence_threshold = float(min_confidence)
-        scanner.rule_engine.strict = bool(strict)
+        # Add error handling for scanner initialization
+        try:
+            scanner = PromptScanner(
+                exclude_patterns=[],
+                parallel_workers=4,
+                use_cache=False,
+                verbose=False,
+            )
+            scanner.rule_engine.min_confidence_threshold = float(min_confidence)
+            scanner.rule_engine.strict = bool(strict)
+        except Exception as e:
+            return jsonify({'error': f'Failed to initialize scanner: {str(e)}'}), 500
 
-        scan_results = scanner.scan(Path(repo_dir))
+        # Add error handling for scanning
+        try:
+            scan_results = scanner.scan(Path(repo_dir))
+        except Exception as e:
+            return jsonify({'error': f'Scan failed: {str(e)}'}), 500
 
         if min_confidence > 0:
             filtered = []
