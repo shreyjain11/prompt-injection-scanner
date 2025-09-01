@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@radix-ui/react-switch": "^1.2.6",
+    "@tabler/icons-react": "^3.34.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
     "geist": "^1.4.2",

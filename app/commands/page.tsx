@@ -2,36 +2,67 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { CheckCircle } from 'lucide-react';
+import { useState } from 'react';
 
 export default function CommandsPage() {
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(label);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
   return (
     <main className="bg-gray-50 dark:bg-gray-900 min-h-screen">
-      <section className="bg-white dark:bg-gray-800">
-        <div className="mx-auto max-w-6xl px-6 py-16 text-center">
-          <div className="inline-block border border-black dark:border-white px-3 py-1 text-xs font-semibold text-black dark:text-white">CLI Reference</div>
-          <h1 className="mt-4 text-5xl md:text-6xl font-extrabold leading-[1.05] tracking-tight text-black dark:text-white">PromptScan CLI</h1>
-          <p className="mt-3 text-base max-w-2xl mx-auto text-gray-700 dark:text-gray-300">Install with pipx or pip, then run scans locally or on any public GitHub repo URL.</p>
-          <div className="mt-6 flex items-center justify-center gap-3">
-            <Button onClick={() => navigator.clipboard.writeText('pipx install prompt-scan')}>pipx install prompt-scan</Button>
-            <Button variant="outline" onClick={() => navigator.clipboard.writeText('prompt-scan https://github.com/owner/repo')}>Copy quick start</Button>
-          </div>
+      <section className="pt-24 pb-16">
+        <div className="mx-auto max-w-6xl px-6 text-center">
+          <div className="inline-block border border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-4 py-2 text-xs font-semibold text-gray-700 dark:text-gray-300 rounded-full">CLI Reference</div>
+          <h1 className="mt-6 text-6xl md:text-7xl font-extrabold leading-[1.05] tracking-tight bg-gradient-to-br from-black to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">PromptScan CLI</h1>
+          <p className="mt-4 text-lg max-w-3xl mx-auto text-gray-700 dark:text-gray-300 leading-relaxed">Install with pipx or pip, then run scans locally or on any public GitHub repo URL.</p>
+          
+          {/* Copy notification */}
+          {copied && (
+            <div className="mt-4 inline-flex items-center gap-2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-4 py-2 rounded-full text-sm font-medium">
+              <CheckCircle className="w-4 h-4" />
+              Copied {copied}!
+            </div>
+          )}
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-6 pb-16">
         <div className="grid grid-cols-1 gap-6">
           <Card title="Installation">
-            <ol className="list-decimal pl-6 space-y-2 text-sm">
-              <li>Install with pipx (recommended): <Code>pipx install prompt-scan</Code></li>
-              <li>Alternatively with pip (user): <Code>pip install --user prompt-scan</Code></li>
-              <li>Verify install: <Code>prompt-scan --version</Code></li>
-            </ol>
-            <p className="text-sm mt-2">If <Code>prompt-scan</Code> is not found, ensure your PATH includes pipx binaries (run <Code>pipx ensurepath</Code> then restart the terminal).</p>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <Code>pipx install prompt-scan</Code>
+                <button 
+                  onClick={() => copyToClipboard('pipx install prompt-scan', 'install command')}
+                  className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-2 py-1 rounded-full hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                >
+                  Copy
+                </button>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Recommended: Install with pipx for isolated environment.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-500">Alternative: <Code>pip install --user prompt-scan</Code></p>
+            </div>
           </Card>
 
           <Card title="Quick start">
-            <Code>prompt-scan https://github.com/owner/repo</Code>
-            <p className="text-sm mt-2">Paste a public GitHub URL directly. The tool fetches the repo ZIP and scans it.</p>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <Code>prompt-scan https://github.com/owner/repo</Code>
+                <button 
+                  onClick={() => copyToClipboard('prompt-scan https://github.com/owner/repo', 'quick start')}
+                  className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-2 py-1 rounded-full hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                >
+                  Copy
+                </button>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Paste a public GitHub URL directly. The tool fetches the repo ZIP and scans it.</p>
+            </div>
           </Card>
 
           <Card title="Scan a local folder">
@@ -97,15 +128,15 @@ export default function CommandsPage() {
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-black dark:text-white p-6 rounded-2xl">
-      <div className="text-md font-semibold">{title}</div>
-      <div className="mt-2">{children}</div>
+    <div className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-black dark:text-white p-8 rounded-2xl shadow-sm">
+      <div className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{title}</div>
+      <div>{children}</div>
     </div>
   );
 }
 
 function Code({ children }: { children: React.ReactNode }) {
-  return <code className="bg-black dark:bg-gray-700 text-white px-2 py-1 rounded-full">{children}</code>;
+  return <code className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-3 py-1 rounded-lg font-mono text-sm border border-gray-200 dark:border-gray-600">{children}</code>;
 }
 
 

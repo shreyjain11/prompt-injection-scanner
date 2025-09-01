@@ -310,32 +310,32 @@ export default function HomePage() {
             {
               title: "Static scan of your repo",
               description: "Parses files, respects .gitignore, and analyzes only relevant code paths.",
-              link: "#"
+              link: "#static-scan"
             },
             {
               title: "Context‑aware heuristics", 
               description: "Understands logging/UI contexts vs dangerous code to reduce false positives.",
-              link: "#"
+              link: "#context-aware"
             },
             {
               title: "Confidence + strict",
               description: "Scores each finding and supports strict mode with tunable thresholds.",
-              link: "#"
+              link: "#confidence"
             },
             {
               title: "CLI & Web",
               description: "Run via prompt-scan in the terminal or paste a URL here for the same engine.",
-              link: "#"
+              link: "#cli-web"
             },
             {
               title: "Language coverage",
               description: "Targets Python/JS/TS first, with a rules engine that's easy to extend.",
-              link: "#"
+              link: "#language"
             },
             {
               title: "GitHub friendly",
               description: "Fetches public repos over HTTPS ZIP, no tokens required for scanning.",
-              link: "#"
+              link: "#github"
             }
           ]}
         />
