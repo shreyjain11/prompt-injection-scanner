@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CheckCircle } from 'lucide-react';
 import { useState } from 'react';
+import SiteHeader from '@/components/site/header';
+import { AuroraBackground } from '@/components/ui/aurora-background';
 
 export default function CommandsPage() {
   const [copied, setCopied] = useState<string | null>(null);
@@ -15,9 +17,11 @@ export default function CommandsPage() {
   };
 
   return (
-    <main className="bg-gray-50 dark:bg-gray-900 min-h-screen">
-      <section className="pt-24 pb-16">
-        <div className="mx-auto max-w-6xl px-6 text-center">
+    <div>
+      <AuroraBackground>
+        <SiteHeader />
+        <section className="relative z-10 pt-16 pb-16">
+          <div className="mx-auto max-w-6xl px-6 text-center">
           <div className="inline-block border border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-4 py-2 text-xs font-semibold text-gray-700 dark:text-gray-300 rounded-full">CLI Reference</div>
           <h1 className="mt-6 text-6xl md:text-7xl font-extrabold leading-[1.05] tracking-tight bg-gradient-to-br from-black to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">PromptScan CLI</h1>
           <p className="mt-4 text-lg max-w-3xl mx-auto text-gray-700 dark:text-gray-300 leading-relaxed">Install with pipx or pip, then run scans locally or on any public GitHub repo URL.</p>
@@ -31,9 +35,11 @@ export default function CommandsPage() {
           )}
         </div>
       </section>
+      </AuroraBackground>
 
-      <section className="mx-auto max-w-6xl px-6 pb-16">
-        <div className="grid grid-cols-1 gap-6">
+      <main className="bg-gray-50 dark:bg-gray-900">
+        <section className="mx-auto max-w-6xl px-6 py-16">
+          <div className="grid grid-cols-1 gap-6">
           <Card title="Installation">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -121,8 +127,9 @@ export default function CommandsPage() {
             </ul>
           </Card>
         </div>
-      </section>
-    </main>
+        </section>
+      </main>
+    </div>
   );
 }
 

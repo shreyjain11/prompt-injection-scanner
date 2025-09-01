@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Shield, Github, Search, Brain, ShieldCheck, Terminal, BarChart3, AlertTriangle, CheckCircle, Clock, Activity, Folder, AlertCircle, XCircle, Minus } from 'lucide-react';
 import { AuroraBackground } from '@/components/ui/aurora-background';
 import { HoverEffect } from '@/components/ui/card-hover-effect';
+import SiteHeader from '@/components/site/header';
 
 type Finding = {
   severity?: string;
@@ -124,6 +125,7 @@ export default function HomePage() {
     <div>
       {/* Hero with Aurora Background */}
       <AuroraBackground>
+        <SiteHeader />
         <section className="relative z-10">
           <div className="mx-auto max-w-6xl px-6 py-32 text-center">
             <div className="inline-block border border-black/20 dark:border-white/20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-4 py-2 text-xs font-semibold rounded-full text-black dark:text-white">Powered by heuristics</div>
