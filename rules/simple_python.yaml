@@ -1,0 +1,69 @@
+# Simple Python prompt injection detection rules
+
+language: python
+version: "1.0"
+description: "Python prompt injection vulnerability detection rules"
+
+rules:
+  direct_injection:
+    - id: "PI-PY-001"
+      name: "Direct Prompt Concatenation"
+      description: "User input directly concatenated into AI prompts"
+      severity: "high"
+      patterns:
+        - pattern: "prompt.*\\+.*user"
+          message: "User input concatenated with prompt"
+        - pattern: "user.*\\+.*prompt"
+          message: "Prompt concatenated with user input"
+      examples:
+        vulnerable:
+          - 'prompt = "You are a helpful assistant. " + user_input'
+        secure:
+          - 'messages = [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": user_input}]'
+
+  unsafe_functions:
+    - id: "PI-PY-002"
+      name: "Unsafe Functions"
+      description: "Dangerous functions with user input"
+      severity: "critical"
+      patterns:
+        - pattern: "eval\\("
+          message: "Eval with user input"
+        - pattern: "exec\\("
+          message: "Exec with user input"
+        - pattern: "__import__\\("
+          message: "Dynamic import with user input"
+      examples:
+        vulnerable:
+          - 'result = eval(user_expression)'
+        secure:
+          - 'result = safe_evaluate(user_expression)'
+
+context_analysis:
+  safe_contexts:
+    - "print statements"
+    - "logging"
+    - "debug statements"
+  
+  dangerous_contexts:
+    - "openai api calls"
+    - "langchain calls"
+    - "ai model calls"
+
+frameworks:
+  - name: "OpenAI"
+    patterns:
+      - "import openai"
+      - "openai\\."
+  
+  - name: "LangChain"
+    patterns:
+      - "import langchain"
+      - "langchain\\."
+
+
+
+
+
+
+

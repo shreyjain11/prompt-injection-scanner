@@ -1,0 +1,159 @@
+# Prompt Injection Scanner Configuration
+
+# Scanner Settings
+scanner:
+  max_file_size_mb: 10
+  parallel_workers: 4
+  use_cache: true
+  cache_ttl_hours: 1
+  verbose: false
+
+# File Filtering
+filters:
+  exclude_patterns:
+    - "node_modules/**"
+    - "dist/**"
+    - "build/**"
+    - "__pycache__/**"
+    - ".git/**"
+    - "*.min.js"
+    - "*.min.css"
+    - "*.pyc"
+    - "*.pyo"
+    - ".DS_Store"
+    - "Thumbs.db"
+  
+  include_patterns: []
+  
+  max_file_size_mb: 10
+  skip_binary_files: true
+
+# Rule Configuration
+rules:
+  # Enable/disable specific rule categories
+  enable_categories:
+    - "direct_injection"
+    - "system_pollution"
+    - "template_injection"
+    - "unsafe_formatting"
+    - "hardcoded_prompts"
+  
+  # Language-specific rule sets
+  language_rules:
+    python:
+      enabled: true
+      custom_patterns: []
+      severity_overrides: {}
+    
+    javascript:
+      enabled: true
+      custom_patterns: []
+      severity_overrides: {}
+    
+    typescript:
+      enabled: true
+      custom_patterns: []
+      severity_overrides: {}
+    
+    java:
+      enabled: true
+      custom_patterns: []
+      severity_overrides: {}
+    
+    go:
+      enabled: true
+      custom_patterns: []
+      severity_overrides: {}
+
+# Severity Levels
+severity:
+  critical:
+    color: "red"
+    description: "Critical vulnerabilities that can lead to prompt injection"
+    enabled: true
+  
+  high:
+    color: "bright_red"
+    description: "High-risk vulnerabilities that should be fixed immediately"
+    enabled: true
+  
+  medium:
+    color: "yellow"
+    description: "Medium-risk vulnerabilities that should be reviewed"
+    enabled: true
+  
+  low:
+    color: "blue"
+    description: "Low-risk findings that may need attention"
+    enabled: true
+  
+  info:
+    color: "cyan"
+    description: "Informational findings"
+    enabled: true
+
+# Context Analysis
+context_analysis:
+  enabled: true
+  safe_contexts:
+    - "print statements"
+    - "logging"
+    - "debug statements"
+    - "comments"
+    - "docstrings"
+  
+  dangerous_contexts:
+    - "openai api calls"
+    - "langchain calls"
+    - "anthropic api calls"
+    - "cohere api calls"
+    - "http requests"
+
+# Reporting
+reporting:
+  output_formats:
+    - "cli"
+    - "json"
+    - "html"
+    - "sarif"
+  
+  cli:
+    show_confidence: true
+    show_context: true
+    color_output: true
+    progress_bars: true
+  
+  html:
+    template_path: "templates/report.html"
+    include_code_snippets: true
+    include_recommendations: true
+  
+  sarif:
+    include_help_uri: true
+    include_rule_help: true
+
+# Performance
+performance:
+  enable_ast_analysis: true
+  enable_context_analysis: true
+  enable_caching: true
+  cache_directory: "~/.prompt-scanner/cache"
+  
+  memory_optimization:
+    streaming_processing: false
+    chunk_size_mb: 1
+    max_memory_mb: 512
+
+# Custom Rules
+custom_rules:
+  - name: "Custom Rule 1"
+    pattern: "your_custom_pattern"
+    severity: "high"
+    message: "Custom vulnerability description"
+    languages: ["python", "javascript"]
+    enabled: true
+
+
+
+
+

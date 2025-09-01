@@ -1,0 +1,60 @@
+# Simple JavaScript prompt injection detection rules
+
+language: javascript
+version: "1.0"
+description: "JavaScript prompt injection vulnerability detection rules"
+
+rules:
+  direct_injection:
+    - id: "PI-JS-001"
+      name: "Direct Prompt Concatenation"
+      description: "User input directly concatenated into AI prompts"
+      severity: "high"
+      patterns:
+        - pattern: "prompt.*\\+.*user"
+          message: "User input concatenated with prompt"
+        - pattern: "user.*\\+.*prompt"
+          message: "Prompt concatenated with user input"
+      examples:
+        vulnerable:
+          - 'const prompt = "You are a helpful assistant. " + userInput;'
+        secure:
+          - 'const messages = [{role: "system", content: "You are a helpful assistant."}, {role: "user", content: userInput}];'
+
+  unsafe_functions:
+    - id: "PI-JS-002"
+      name: "Unsafe Functions"
+      description: "Dangerous functions with user input"
+      severity: "critical"
+      patterns:
+        - pattern: "eval\\("
+          message: "Eval with user input"
+        - pattern: "Function\\("
+          message: "Function constructor with user input"
+      examples:
+        vulnerable:
+          - 'const result = eval(userExpression);'
+        secure:
+          - 'const result = safeEvaluate(userExpression);'
+
+context_analysis:
+  safe_contexts:
+    - "console.log"
+    - "console.error"
+    - "console.warn"
+  
+  dangerous_contexts:
+    - "openai api calls"
+    - "anthropic api calls"
+    - "ai model calls"
+
+frameworks:
+  - name: "OpenAI"
+    patterns:
+      - "import.*openai"
+      - "openai\\."
+  
+  - name: "Anthropic"
+    patterns:
+      - "import.*anthropic"
+      - "anthropic\\."

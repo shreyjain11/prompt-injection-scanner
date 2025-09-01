@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Black & white theme */
+:root {
+  --bg: #ffffff;
+  --fg: #000000;
+}
+
+html, body { background: var(--bg); color: var(--fg); }
+
+/* Design system: rounded, modern, black-on-white */
+.btn { @apply inline-flex items-center justify-center px-5 py-2 text-sm font-semibold border border-black tracking-tight rounded-full; box-shadow: 0 1px 0 0 #000; }
+.btn-primary { @apply bg-black text-white; }
+.btn-primary:hover { filter: brightness(0.95); transform: translateY(-1px); }
+.btn-ghost { @apply bg-white text-black; }
+.btn-ghost:hover { @apply bg-black text-white; transform: translateY(-1px); }
+.badge { @apply inline-block border border-black px-3 py-1 text-xs font-semibold uppercase rounded-full; }
+.card { @apply border border-black p-6 rounded-xl; box-shadow: 0 1px 0 0 #000; }
+.input { @apply border border-black px-4 py-2 text-sm bg-white text-black rounded-full; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+.grotesk { font-family: var(--font-grotesk), Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+
+

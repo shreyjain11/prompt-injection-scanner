@@ -1,0 +1,270 @@
+# Prompt Injection Scanner
+
+A powerful CLI tool for detecting potential prompt injection vulnerabilities in AI-powered applications. This scanner helps developers identify security risks in their codebases by analyzing patterns that could lead to prompt injection attacks.
+
+## Features
+
+- **Language Agnostic**: Supports multiple programming languages including Python, JavaScript, TypeScript, Java, Go, and more
+- **Comprehensive Detection**: Identifies various prompt injection patterns:
+  - Direct prompt injection (user input concatenation)
+  - System prompt pollution
+  - Template injection vulnerabilities
+  - Unsafe string formatting
+  - Hardcoded prompts with user placeholders
+- **High Performance**: Parallel processing, intelligent caching, and optimized file filtering
+- **Rich Reporting**: Beautiful CLI output with detailed vulnerability reports
+- **Extensible**: Easy to add custom detection rules
+- **CI/CD Ready**: Designed for integration into automated workflows
+
+## Installation
+
+```bash
+# Using pipx (recommended)
+pipx install prompt-injection-scanner
+
+# Or using pip (user install)
+pip install --user prompt-injection-scanner
+
+# Or run in Docker
+docker build -t prompt-injection-scanner .
+docker run --rm -v "$PWD:/work" -w /work prompt-injection-scanner prompt-scan --help
+```
+
+## Quick Start
+
+```bash
+# Scan a public GitHub repository (no need to clone)
+prompt-scan https://github.com/owner/repo
+
+# Or scan a local directory
+prompt-scan scan /path/to/your/project
+
+# Helpful flags
+prompt-scan https://github.com/owner/repo --no-progress             # clean output (no spinner)
+prompt-scan https://github.com/owner/repo --summary-only            # print only summary
+prompt-scan https://github.com/owner/repo --min-confidence 0.7      # filter by confidence
+prompt-scan https://github.com/owner/repo --strict                  # high-precision mode
+prompt-scan scan /path --severity high --severity critical          # repeatable severity filter
+
+# Show help
+prompt-scan --help
+prompt-scan scan --help
+```
+
+## Usage Examples
+
+### Basic Scan
+```bash
+python cli.py scan ./my-ai-app
+```
+
+### Filter by Severity
+```bash
+# Only show high and critical vulnerabilities
+python cli.py scan ./my-ai-app --severity high critical
+```
+
+### Exclude Directories
+```bash
+# Skip common directories
+python cli.py scan ./my-ai-app --exclude node_modules dist build
+```
+
+### Performance Options
+```bash
+# Use 8 parallel workers for faster scanning
+python cli.py scan ./my-ai-app --parallel 8
+
+# Disable caching for fresh results
+python cli.py scan ./my-ai-app --no-cache
+```
+
+## Vulnerability Types Detected
+
+### 1. Direct Prompt Injection (High Severity)
+Detects when user input is directly concatenated into AI prompts:
+
+```python
+# ❌ Vulnerable
+prompt = "You are a helpful assistant. " + user_input
+response = openai.ChatCompletion.create(messages=[{"role": "user", "content": prompt}])
+
+# ✅ Secure
+prompt = "You are a helpful assistant. Please respond to the user's question."
+response = openai.ChatCompletion.create(messages=[
+    {"role": "system", "content": prompt},
+    {"role": "user", "content": user_input}
+])
+```
+
+### 2. System Prompt Pollution (Critical Severity)
+Identifies when user content is mixed with system instructions:
+
+```python
+# ❌ Vulnerable
+system_prompt = f"You are a helpful assistant. User context: {user_context}"
+messages = [{"role": "system", "content": system_prompt}]
+
+# ✅ Secure
+system_prompt = "You are a helpful assistant."
+user_message = f"Context: {user_context}\nQuestion: {user_question}"
+messages = [
+    {"role": "system", "content": system_prompt},
+    {"role": "user", "content": user_message}
+]
+```
+
+### 3. Template Injection (High Severity)
+Detects unsafe template usage with user input:
+
+```python
+# ❌ Vulnerable
+template = "Hello {name}, you are {role}"
+message = template.format(name=user_name, role=user_role)
+
+# ✅ Secure
+template = "Hello {name}"
+message = template.format(name=sanitize_input(user_name))
+```
+
+### 4. Unsafe Formatting (Critical Severity)
+Identifies dangerous string formatting patterns:
+
+```python
+# ❌ Vulnerable
+prompt = "Tell me about %s" % user_input
+result = eval(user_expression)
+
+# ✅ Secure
+prompt = "Tell me about the user's request"
+result = safe_evaluate(user_expression)
+```
+
+## Configuration
+
+### Custom Rules
+The scanner uses a rule-based system that can be extended. Rules are defined in YAML format and can be added to detect new patterns.
+
+### Exclude Patterns
+Common patterns to exclude from scanning:
+- `node_modules/**` - Node.js dependencies
+- `dist/**` - Build outputs
+- `__pycache__/**` - Python cache
+- `*.min.js` - Minified JavaScript
+- `.git/**` - Version control
+
+## Output Formats
+
+### CLI Output (Default)
+Rich, colorized terminal output with:
+- Scan summary with statistics
+- Findings grouped by file and severity
+- Code snippets showing vulnerable lines
+- Security recommendations
+
+### JSON Output
+```bash
+prompt-scan https://github.com/owner/repo --no-progress --output json | jq .
+```
+
+### HTML Output
+```bash
+prompt-scan scan ./my-ai-app --output html
+```
+
+## CLI Indexer
+
+Build an index of repository files for tooling or caching.
+
+```bash
+prompt-scan index /path/to/your/project -o index.json
+```
+
+## Rules overview
+
+```bash
+prompt-scan rules
+# → shows loaded languages, rule counts, and severities
+```
+
+## Benchmarking (precision/recall)
+
+```bash
+# Evaluate built-in examples (Python + JavaScript)
+prompt-scan bench -l python -l javascript
+
+# Auto-tune for best F1 while enforcing precision/recall constraints
+prompt-scan bench --tune --min-precision 0.95 --min-recall 0.50
+```
+
+## Performance
+
+The scanner is optimized for large codebases:
+- **Parallel Processing**: Configurable number of workers
+- **Intelligent Caching**: Caches results to avoid re-scanning unchanged files
+- **Smart Filtering**: Skips binary files, large files, and common directories
+- **Incremental Scanning**: Only scans modified files when using cache
+
+## Security Recommendations
+
+1. **Input Validation**: Always validate and sanitize user input
+2. **Parameterized Prompts**: Use structured prompts instead of string concatenation
+3. **Role Separation**: Keep system instructions separate from user content
+4. **Output Encoding**: Encode AI responses to prevent injection
+5. **Least Privilege**: Limit AI model access and capabilities
+6. **Regular Audits**: Run security scans regularly
+7. **Adversarial Testing**: Test with malicious inputs
+8. **Documentation**: Document security practices
+
+## Contributing
+
+We welcome contributions! Please see our contributing guidelines for:
+- Adding new detection rules
+- Improving performance
+- Enhancing reporting
+- Bug fixes and feature requests
+
+## License
+
+[Add your license information here]
+
+## Support
+
+For issues, questions, or contributions:
+- Open an issue on GitHub
+- Check the documentation
+- Review the examples
+
+## Roadmap
+
+- [x] GitHub URL scanning via codeload + default-branch discovery
+- [ ] SARIF output for CI/CD integration
+- [ ] Custom rule creation interface
+- [ ] False positive reduction with machine learning
+- [ ] Integration with popular IDEs
+- [ ] Real-time scanning for development environments
+
+## Web (Vercel) deployment
+
+Deploy a minimal black-and-white web UI that mirrors the CLI. The web app lives in `web/`.
+
+1. Install Vercel CLI and log in
+```bash
+npm i -g vercel
+vercel login
+```
+
+2. Deploy from the `web/` folder
+```bash
+cd web
+vercel --prod
+```
+
+Notes:
+- The API endpoint is `api/scan.py` (Python 3.11 runtime) and depends on the published package.
+- `index.html` is a simple UI where users paste a GitHub URL and view results.
+- If you see rate limits, Vercel’s IP-based unauthenticated GitHub API limit (~60 req/hr) may apply.
+
+
+
+
