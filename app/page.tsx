@@ -207,7 +207,7 @@ export default function HomePage() {
                   <StatCard 
                     icon={<Clock className="w-6 h-6" />}
                     label="Scan Time" 
-                    value={`${data.summary.scan_duration ?? 0}s`}
+                    value={`${(data.summary.scan_duration ?? 0).toFixed(3)}s`}
                     subtitle="completed"
                   />
                   <StatCard 
