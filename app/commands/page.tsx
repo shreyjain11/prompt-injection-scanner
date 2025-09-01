@@ -5,12 +5,12 @@ import { Input } from '@/components/ui/input';
 
 export default function CommandsPage() {
   return (
-    <main>
-      <section>
+    <main className="bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <section className="bg-white dark:bg-gray-800">
         <div className="mx-auto max-w-6xl px-6 py-16 text-center">
-          <div className="inline-block border border-black px-3 py-1 text-xs font-semibold">CLI Reference</div>
-          <h1 className="mt-4 text-5xl md:text-6xl font-extrabold leading-[1.05] tracking-tight">PromptScan CLI</h1>
-          <p className="mt-3 text-base max-w-2xl mx-auto">Install with pipx or pip, then run scans locally or on any public GitHub repo URL.</p>
+          <div className="inline-block border border-black dark:border-white px-3 py-1 text-xs font-semibold text-black dark:text-white">CLI Reference</div>
+          <h1 className="mt-4 text-5xl md:text-6xl font-extrabold leading-[1.05] tracking-tight text-black dark:text-white">PromptScan CLI</h1>
+          <p className="mt-3 text-base max-w-2xl mx-auto text-gray-700 dark:text-gray-300">Install with pipx or pip, then run scans locally or on any public GitHub repo URL.</p>
           <div className="mt-6 flex items-center justify-center gap-3">
             <Button onClick={() => navigator.clipboard.writeText('pipx install prompt-scan')}>pipx install prompt-scan</Button>
             <Button variant="outline" onClick={() => navigator.clipboard.writeText('prompt-scan https://github.com/owner/repo')}>Copy quick start</Button>
@@ -97,7 +97,7 @@ export default function CommandsPage() {
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="border border-black bg-white text-black p-6 rounded-2xl">
+    <div className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-black dark:text-white p-6 rounded-2xl">
       <div className="text-md font-semibold">{title}</div>
       <div className="mt-2">{children}</div>
     </div>
@@ -105,7 +105,7 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 }
 
 function Code({ children }: { children: React.ReactNode }) {
-  return <code className="bg-black text-white px-2 py-1 rounded-full">{children}</code>;
+  return <code className="bg-black dark:bg-gray-700 text-white px-2 py-1 rounded-full">{children}</code>;
 }
 
 

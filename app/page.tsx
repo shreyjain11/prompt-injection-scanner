@@ -125,53 +125,53 @@ export default function HomePage() {
       <AuroraBackground>
         <section className="relative z-10">
           <div className="mx-auto max-w-6xl px-6 py-32 text-center">
-            <div className="inline-block border border-black/20 bg-white/80 backdrop-blur-sm px-4 py-2 text-xs font-semibold rounded-full">Powered by heuristics</div>
-            <h1 className="mt-6 text-7xl font-extrabold leading-[1.05] tracking-tight bg-gradient-to-br from-black to-gray-600 bg-clip-text text-transparent">PromptScan</h1>
-            <p className="mt-4 text-lg max-w-2xl mx-auto text-gray-700 leading-relaxed">Paste a public GitHub URL and get an incredibly accurate report of potential prompt injection risks.</p>
+            <div className="inline-block border border-black/20 dark:border-white/20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-4 py-2 text-xs font-semibold rounded-full text-black dark:text-white">Powered by heuristics</div>
+            <h1 className="mt-6 text-7xl font-extrabold leading-[1.05] tracking-tight bg-gradient-to-br from-black to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">PromptScan</h1>
+            <p className="mt-4 text-lg max-w-2xl mx-auto text-gray-700 dark:text-gray-300 leading-relaxed">Paste a public GitHub URL and get an incredibly accurate report of potential prompt injection risks.</p>
             <div className="mt-8 flex items-center justify-center gap-4">
-              <a href="#scan" className="inline-flex items-center justify-center text-sm font-medium px-6 py-3 rounded-full bg-black text-white border border-black hover:brightness-95 hover:scale-105 transition-all duration-200 shadow-lg">Get Started</a>
-              <a href="https://github.com" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm font-medium px-6 py-3 rounded-full bg-white/80 backdrop-blur-sm text-black border border-black/20 hover:bg-white hover:shadow-lg transition-all duration-200"><Github className="w-4 h-4"/> GitHub</a>
+              <a href="#scan" className="inline-flex items-center justify-center text-sm font-medium px-6 py-3 rounded-full bg-black dark:bg-white text-white dark:text-black border border-black dark:border-white hover:brightness-95 hover:scale-105 transition-all duration-200 shadow-lg">Get Started</a>
+              <a href="https://github.com" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm font-medium px-6 py-3 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-black dark:text-white border border-black/20 dark:border-white/20 hover:bg-white dark:hover:bg-gray-700 hover:shadow-lg transition-all duration-200"><Github className="w-4 h-4"/> GitHub</a>
             </div>
           </div>
         </section>
       </AuroraBackground>
 
       {/* Scanner input on white card */}
-      <main className="bg-gray-50 min-h-screen">
+      <main className="bg-gray-50 dark:bg-gray-900 min-h-screen">
         <section id="scan" className="mx-auto max-w-6xl px-6 py-16">
-          <div className="border border-gray-200 bg-white text-black p-8 rounded-3xl shadow-xl">
-            <div className="text-xl font-semibold flex items-center gap-3 mb-6"><Shield className="w-6 h-6 text-blue-600"/> Scan a Repository</div>
+          <div className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-black dark:text-white p-8 rounded-3xl shadow-xl">
+            <div className="text-xl font-semibold flex items-center gap-3 mb-6"><Shield className="w-6 h-6 text-blue-600 dark:text-blue-400"/> Scan a Repository</div>
             <div className="flex gap-4">
               <Input 
                 value={url} 
                 onChange={e => setUrl(e.target.value)} 
                 placeholder="https://github.com/owner/repo" 
-                className="flex-1 h-12 px-4 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-blue-500"
+                className="flex-1 h-12 px-4 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white rounded-xl focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400"
               />
               <Button 
                 onClick={scan}
-                className="h-12 px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors"
+                className="h-12 px-8 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-xl font-medium transition-colors"
               >
                 {loading ? <Activity className="w-4 h-4 animate-spin mr-2" /> : null}
                 Scan
               </Button>
             </div>
             {error && (
-              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
-                <div className="flex items-center gap-2 text-red-800">
+              <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+                <div className="flex items-center gap-2 text-red-800 dark:text-red-300">
                   <AlertCircle className="w-4 h-4" />
                   <span className="font-medium">Error:</span>
                 </div>
-                <p className="text-red-700 mt-1 text-sm">{error}</p>
+                <p className="text-red-700 dark:text-red-400 mt-1 text-sm">{error}</p>
               </div>
             )}
             {loading && (
-              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                <div className="flex items-center gap-3 text-blue-800">
+              <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                <div className="flex items-center gap-3 text-blue-800 dark:text-blue-300">
                   <Activity className="w-5 h-5 animate-spin" />
                   <span className="font-medium">Scanning repository...</span>
                 </div>
-                <p className="text-blue-700 text-sm mt-1">This may take a few moments depending on repository size.</p>
+                <p className="text-blue-700 dark:text-blue-400 text-sm mt-1">This may take a few moments depending on repository size.</p>
               </div>
             )}
           </div>
@@ -181,9 +181,9 @@ export default function HomePage() {
       <section className="mx-auto max-w-6xl px-6 pb-16">
         <div className="grid grid-cols-1 gap-6">
           {/* Summary card */}
-          <div className="border border-black bg-white text-black p-6 rounded-2xl">
+          <div className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-black dark:text-white p-6 rounded-2xl">
             <div className="flex items-center gap-2 mb-4">
-              <Shield className="w-5 h-5"/>
+              <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400"/>
               <div className="text-md font-semibold uppercase">Scan Summary</div>
             </div>
             <div className="mt-2">
@@ -216,25 +216,25 @@ export default function HomePage() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <Shield className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-                  <div className="text-sm text-gray-600">Ready to scan! Paste a GitHub URL above.</div>
+                  <Shield className="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-3" />
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Ready to scan! Paste a GitHub URL above.</div>
                 </div>
               )}
             </div>
           </div>
 
           {/* Findings - Beautiful Cards */}
-          <div className="border border-black bg-white text-black p-6 rounded-2xl">
+          <div className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-black dark:text-white p-6 rounded-2xl">
             <div className="flex items-center justify-between mb-4">
               <div className="text-md font-semibold uppercase">Security Findings</div>
-              <div className="text-sm text-gray-600">{rows.length} total findings</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">{rows.length} total findings</div>
             </div>
             
             {!rows.length && (
               <div className="text-center py-12">
-                <Shield className="w-16 h-16 mx-auto text-green-600 mb-4"/>
-                <div className="text-lg font-semibold text-green-600">No vulnerabilities found!</div>
-                <div className="text-sm text-gray-500 mt-1">Your repository looks secure.</div>
+                <Shield className="w-16 h-16 mx-auto text-green-600 dark:text-green-400 mb-4"/>
+                <div className="text-lg font-semibold text-green-600 dark:text-green-400">No vulnerabilities found!</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Your repository looks secure.</div>
               </div>
             )}
             
@@ -303,7 +303,7 @@ export default function HomePage() {
 
       {/* What it does - info cards */}
       <section className="mx-auto max-w-6xl px-6 pb-24">
-        <h2 className="text-3xl font-extrabold tracking-tight mb-8 text-center text-gray-900">What PromptScan Does</h2>
+        <h2 className="text-3xl font-extrabold tracking-tight mb-8 text-center text-gray-900 dark:text-white">What PromptScan Does</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <InfoCard icon={<Search className="w-6 h-6 text-blue-600"/>} title="Static scan of your repo" desc="Parses files, respects .gitignore, and analyzes only relevant code paths."/>
           <InfoCard icon={<Brain className="w-6 h-6 text-purple-600"/>} title="Context‑aware heuristics" desc="Understands logging/UI contexts vs dangerous code to reduce false positives."/>
@@ -320,25 +320,25 @@ export default function HomePage() {
 
 function StatCard({ icon, label, value, subtitle }: { icon: React.ReactNode; label: string; value: string; subtitle: string }) {
   return (
-    <div className="border border-gray-200 bg-gray-50 p-4 text-center rounded-xl hover:shadow-md transition-shadow">
+    <div className="border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-4 text-center rounded-xl hover:shadow-md transition-shadow">
       <div className="flex justify-center mb-3">{icon}</div>
-      <div className="text-xs uppercase font-semibold text-gray-600 mb-1">{label}</div>
-      <div className="text-2xl font-extrabold text-gray-900">{value}</div>
-      <div className="text-xs text-gray-500">{subtitle}</div>
+      <div className="text-xs uppercase font-semibold text-gray-600 dark:text-gray-300 mb-1">{label}</div>
+      <div className="text-2xl font-extrabold text-gray-900 dark:text-white">{value}</div>
+      <div className="text-xs text-gray-500 dark:text-gray-400">{subtitle}</div>
     </div>
   );
 }
 
 function InfoCard({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
-    <div className="border border-gray-200 bg-white p-6 rounded-2xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
-      <div className="flex items-center gap-3 font-semibold text-gray-900 mb-3">
-        <div className="p-2 bg-gray-50 rounded-lg group-hover:scale-110 transition-transform">
+    <div className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 rounded-2xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
+      <div className="flex items-center gap-3 font-semibold text-gray-900 dark:text-white mb-3">
+        <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg group-hover:scale-110 transition-transform">
           {icon}
         </div>
         <span className="text-lg">{title}</span>
       </div>
-      <p className="text-gray-600 leading-relaxed">{desc}</p>
+      <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{desc}</p>
     </div>
   );
 }
