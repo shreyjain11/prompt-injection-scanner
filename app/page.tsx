@@ -288,7 +288,7 @@ export default function HomePage() {
                                   </code>
                                   {it.confidence != null && (
                                     <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                                      {Math.round(it.confidence * 100)}% confidence
+                                      {(it.confidence * 100).toFixed(1)}% confidence
                                     </span>
                                   )}
                                 </div>

@@ -4,6 +4,7 @@ Context analyzer for distinguishing between vulnerable and safe code patterns.
 """
 
 import re
+import hashlib
 from typing import List, Dict, Any, Optional, Tuple
 from pathlib import Path
 
@@ -187,6 +188,16 @@ class ContextAnalyzer:
             elif len(ln) > 200:
                 score -= 0.25; reasons.append("long line")
 
+        # Deterministic micro-jitter to avoid ties (±0.03)
+        try:
+            key = f"{file_path}:{line_number}:{context}".encode("utf-8", errors="ignore")
+            h = hashlib.sha256(key).digest()
+            frac = int.from_bytes(h[:2], 'big') / 65535.0  # 0..1
+            jitter = (frac - 0.5) * 0.06  # -0.03..+0.03
+            score += jitter
+        except Exception:
+            pass
+
         # Clamp score
         score = max(0.0, min(1.0, score))
         reason = ", ".join(reasons) if reasons else "neutral"
@@ -270,11 +281,13 @@ class ContextAnalyzer:
                 r'langchain\.[a-zA-Z]+\s*\([^)]*\)',  # LangChain calls
                 r'prompt\s*[=+]\s*[^+]*\+',  # prompt concatenation
                 r'messages\s*=\s*\[[^\]]*\{[^}]*content[^}]*\{[^}]*\}[^}]*\}[^\]]*\]',  # messages with user input
+                r'\beval\s*\(', r'\bexec\s*\('  # explicit dangerous execution
             ],
             'javascript': [
                 r'openai\.[a-zA-Z]+\.[a-zA-Z]+\s*\([^)]*\)',  # OpenAI API calls
                 r'messages\s*:\s*\[[^\]]*\{[^}]*content[^}]*\{[^}]*\}[^}]*\}[^\]]*\]',  # messages with user input
                 r'prompt\s*[=+]\s*[^+]*\+',  # prompt concatenation
+                r'\beval\s*\(',  # JS eval
             ]
         }
         

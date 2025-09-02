@@ -198,7 +198,8 @@ class CLIReportGenerator:
             
             # Format the finding
             confidence = finding.get('confidence', 1.0)
-            confidence_text = f"Confidence: {confidence:.1f}"
+            # Show 0-100 with 1-decimal resolution for realism
+            confidence_text = f"Confidence: {confidence * 100:.1f}%"
             
             content = f"[bold]{message}[/bold]\n"
             content += f"Rule: [dim]{rule_id}[/dim]\n"
