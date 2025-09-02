@@ -118,8 +118,11 @@ export default function HomePage() {
     } catch (e: any) {
       const msg = String(e?.message || e || '');
       const isRate = /rate limit/i.test(msg);
+      const isSpace = /No space left on device|ENOSPC/i.test(msg);
       const hint = isRate
         ? 'GitHub API rate limit hit. Try again in a minute, add a branch suffix like /tree/main, or set GITHUB_TOKEN on the API server.'
+        : isSpace
+        ? 'Server temporary storage is full. Please retry shortly. If it persists, the server needs temp cleanup.'
         : 'Check your deployed API and set NEXT_PUBLIC_API_BASE (e.g., https://your-app.vercel.app).';
       setError(`${msg} ${hint}`);
     } finally { setLoading(false); }

@@ -75,7 +75,11 @@ def scan_handler():
         try:
             repo_dir = fetch_github_repo_to_dir(url)
         except Exception as e:
-            return jsonify({'error': f'Failed to fetch repository: {str(e)}'}), 400
+            # Normalize common /tmp exhaustion errors with a clear action
+            msg = str(e)
+            if 'No space left on device' in msg or 'ENOSPC' in msg:
+                return jsonify({'error': 'Server temporary storage is full. Please retry in a minute or use a smaller repo. Admin action: clear /tmp on the serverless instance or reduce temp extraction size.'}), 503
+            return jsonify({'error': f'Failed to fetch repository: {msg}'}), 400
 
         # Add error handling for scanner initialization
         try:

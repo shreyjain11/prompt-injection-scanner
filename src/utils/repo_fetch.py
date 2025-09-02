@@ -12,6 +12,7 @@ import zipfile
 import io
 import re
 import os
+import shutil
 
 
 GITHUB_REPO_RE = re.compile(r"^https?://github\.com/(?P<owner>[^/]+)/(?P<repo>[^/#?]+)(?:/tree/(?P<ref>[^/#?]+))?/?$")
@@ -159,11 +160,23 @@ def fetch_github_repo_to_dir(url: str, dest_dir: Optional[Path] = None) -> Path:
     extract_root = Path(dest_dir) if dest_dir else Path(tempfile.mkdtemp(prefix="repo_"))
     zf.extractall(extract_root)
 
-    # The archive extracts into a single top-level folder like repo-ref/
-    # Find the first directory inside extract_root
+    # Many GitHub archives unwrap to a single nested folder: <repo>-<ref>/
+    # Flatten so that the returned path is the temp root itself. This ensures
+    # callers can remove a single directory to clean everything and avoids
+    # leaking empty temp parents across requests (which can exhaust /tmp).
     subdirs = [p for p in extract_root.iterdir() if p.is_dir()]
     if len(subdirs) == 1:
-        return subdirs[0]
+        inner = subdirs[0]
+        try:
+            for child in inner.iterdir():
+                shutil.move(str(child), str(extract_root / child.name))
+            # Remove the empty inner wrapper directory
+            inner.rmdir()
+        except Exception:
+            # Even if flattening fails, return the inner directory so callers
+            # can still scan. Cleanup code should attempt to delete the parent.
+            return inner
+
     return extract_root
 
 
