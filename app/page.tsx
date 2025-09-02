@@ -133,7 +133,7 @@ export default function HomePage() {
             <p className="mt-4 text-lg max-w-2xl mx-auto text-gray-700 dark:text-gray-300 leading-relaxed">Paste a public GitHub URL and get an incredibly accurate report of potential prompt injection risks.</p>
             <div className="mt-8 flex items-center justify-center gap-4">
               <a href="#scan" className="inline-flex items-center justify-center text-sm font-medium px-6 py-3 rounded-full bg-black dark:bg-white text-white dark:text-black border border-black dark:border-white hover:brightness-95 hover:scale-105 transition-all duration-200 shadow-lg">Get Started</a>
-              <a href="https://github.com" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm font-medium px-6 py-3 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-black dark:text-white border border-black/20 dark:border-white/20 hover:bg-white dark:hover:bg-gray-700 hover:shadow-lg transition-all duration-200"><Github className="w-4 h-4"/> GitHub</a>
+              <a href="https://github.com/shreyjain11/prompt-injection-scanner" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm font-medium px-6 py-3 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-black dark:text-white border border-black/20 dark:border-white/20 hover:bg-white dark:hover:bg-gray-700 hover:shadow-lg transition-all duration-200"><Github className="w-4 h-4"/> GitHub</a>
             </div>
           </div>
         </section>
