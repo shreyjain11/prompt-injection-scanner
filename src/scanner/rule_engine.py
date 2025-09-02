@@ -71,7 +71,7 @@ class RuleEngine:
         scored_findings = []
         for finding in findings:
             confidence, reason = self.context_analyzer.analyze_context(
-                content, file_path, language, finding.line_number, finding.context
+                content, file_path, language, finding.line_number, finding.context, finding.severity
             )
             finding.confidence = confidence
             if reason and reason != 'neutral':

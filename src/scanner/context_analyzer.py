@@ -75,7 +75,7 @@ class ContextAnalyzer:
             self.compiled_dangerous[lang] = [re.compile(pattern, re.IGNORECASE) for pattern in patterns]
     
     def analyze_context(self, content: str, file_path: Path, language: Optional[str], 
-                       line_number: int, context: str) -> Tuple[float, str]:
+                       line_number: int, context: str, base_severity: Optional[str] = None) -> Tuple[float, str]:
         """
         Compute a confidence score (0.0-1.0) that a finding is truly vulnerable.
         
@@ -98,13 +98,26 @@ class ContextAnalyzer:
         end_line = min(len(lines), line_number + 3)
         surrounding_context = '\n'.join(lines[start_line:end_line])
         
-        # Start with neutral prior
-        score = 0.5
-        reasons = []
+        # Start with conservative prior and severity prior
+        score = 0.35
+        reasons: List[str] = []
+
+        if base_severity:
+            sev = base_severity.lower()
+            sev_boost = {
+                'critical': 0.25,
+                'high': 0.15,
+                'medium': 0.05,
+                'low': 0.0,
+                'info': -0.05,
+            }.get(sev, 0.0)
+            if sev_boost:
+                score += sev_boost
+                reasons.append(f"severity:{sev}")
         
         # Dangerous context increases confidence
         if self._is_in_dangerous_context(surrounding_context, language):
-            score += 0.3
+            score += 0.35
             reasons.append("dangerous context")
         
         # Safe context decreases confidence
@@ -148,20 +161,53 @@ class ContextAnalyzer:
                 score -= 0.25
                 reasons.append("non-user variable")
         
-        # LLM usage proximity heuristic: if context assigns to 'content' or 'prompt' but no nearby LLM API, downweight
-        lowered = surrounding_context.lower()
+        # LLM usage proximity heuristic: distance to LLM API usage
+        llm_patterns = [
+            r'openai\.', r'langchain', r'anthropic\.', r'gemini\.', r'groq\.', r'cohere\.',
+            r'chat\.?completions?\.?create', r'Completion\.create', r'ChatCompletion\.create', r'messages\s*[:=]'
+        ]
+        distance = self._distance_to_any_pattern(lines, line_number, llm_patterns)
+        if distance is not None:
+            if distance <= 3:
+                score += 0.25; reasons.append("llm proximity:<=3")
+            elif distance <= 10:
+                score += 0.15; reasons.append("llm proximity:<=10")
+            elif distance <= 20:
+                score += 0.1; reasons.append("llm proximity:<=20")
         assigns_prompt = re.search(r'\b(content|prompt)\s*[:=]', surrounding_context)
-        has_llm_api = (
-            'openai.' in lowered or 'chatcompletion' in lowered or 'completions.create' in lowered or 'messages' in lowered or 'langchain' in lowered
-        )
-        if assigns_prompt and not has_llm_api:
-            score -= 0.2
-            reasons.append("no llm api nearby")
+        if assigns_prompt and (distance is None or distance > 20):
+            score -= 0.3
+            reasons.append("assigns prompt without llm usage nearby")
         
+        # Long-line penalty — data blobs are less likely to be code logic
+        if isinstance(lines[line_number - 1] if 0 < line_number <= len(lines) else '', str):
+            ln = lines[line_number - 1] if 0 < line_number <= len(lines) else ''
+            if len(ln) > 400:
+                score -= 0.35; reasons.append("very long line")
+            elif len(ln) > 200:
+                score -= 0.25; reasons.append("long line")
+
         # Clamp score
         score = max(0.0, min(1.0, score))
         reason = ", ".join(reasons) if reasons else "neutral"
         return score, reason
+
+    def _distance_to_any_pattern(self, lines: List[str], line_number: int, patterns: List[str]) -> Optional[int]:
+        """Return the distance in lines to the closest match of any pattern within ±50 lines.
+
+        If none found, return None.
+        """
+        window_before = max(0, line_number - 50)
+        window_after = min(len(lines), line_number + 50)
+        compiled = [re.compile(p, re.IGNORECASE) for p in patterns]
+        nearest: Optional[int] = None
+        for idx in range(window_before, window_after):
+            text = lines[idx]
+            if any(c.search(text) for c in compiled):
+                dist = abs(idx + 1 - line_number)
+                if nearest is None or dist < nearest:
+                    nearest = dist
+        return nearest
     
     def _is_in_dangerous_context(self, context: str, language: str) -> bool:
         """Check if the context is in a dangerous area."""
