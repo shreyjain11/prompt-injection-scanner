@@ -293,6 +293,11 @@ export default function HomePage() {
                                   )}
                                 </div>
                                 <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">{it.message}</p>
+                                {('code_snippet' in it as any) && (it as any).code_snippet ? (
+                                  <pre className="mt-2 text-xs bg-black/80 text-white p-3 rounded-lg overflow-x-auto whitespace-pre-wrap">
+                                    {(it as any).code_snippet}
+                                  </pre>
+                                ) : null}
                                 <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-2 font-mono truncate" title={it.file}>
                                   <Folder className="w-3 h-3 flex-shrink-0" />
                                   <span className="truncate">{it.file}</span>

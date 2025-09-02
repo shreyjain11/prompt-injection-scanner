@@ -60,7 +60,7 @@ class RuleEngine:
         findings = []
         lines = content.split('\n')
         
-        # Apply language-agnostic rules
+        # Apply language-agnostic rules (but only for code-like languages to avoid data files)
         findings.extend(self._apply_generic_rules(content, lines, file_path, language))
         
         # Apply language-specific rules
@@ -108,12 +108,20 @@ class RuleEngine:
                     continue
             filtered_findings.append(f)
         
-        # Convert findings to dictionaries
-        return [self._finding_to_dict(finding) for finding in filtered_findings]
+        # Convert findings to dictionaries and include small code snippet context
+        return [self._finding_to_dict(finding, content) for finding in filtered_findings]
     
     def _apply_generic_rules(self, content: str, lines: List[str], file_path: Path, language: Optional[str]) -> List[Finding]:
         """Apply language-agnostic rules."""
         findings = []
+
+        # Restrict generic rules to code-like languages to reduce false positives
+        code_langs = {
+            'python','javascript','typescript','java','go','ruby','php','c','cpp','csharp','rust',
+            'swift','kotlin','scala','dart','r','shell','powershell','batch'
+        }
+        if language not in code_langs:
+            return findings
         
         # Rule 1: Direct prompt injection - user input concatenated into prompts
         findings.extend(self._find_direct_prompt_injection(content, lines, file_path))
@@ -186,12 +194,8 @@ class RuleEngine:
         # Patterns for user content in system messages
         patterns = [
             # System role with user content
-            (r'["\']system["\']\s*[:\s,]\s*["\']([^"\']*\{[^}]*\}[^"\']*)["\']', 'System prompt with user placeholder'),
-            (r'role["\']?\s*:\s*["\']system["\']\s*[,\s]\s*content["\']?\s*:\s*["\']([^"\']*\{[^}]*\}[^"\']*)["\']', 'System role with user content'),
-            
-            # Mixed instructions
-            (r'["\']([^"\']*system[^"\']*user[^"\']*)["\']', 'Mixed system/user instructions'),
-            (r'["\']([^"\']*user[^"\']*system[^"\']*)["\']', 'Mixed user/system instructions'),
+            (r'role\s*[:=]\s*["\']system["\']\s*[,}]', 'System message role field'),
+            (r'content\s*[:=]\s*["\'][^"\']*\{[^}]*\}[^"\']*["\']', 'Message content includes placeholder'),
         ]
         
         for pattern, message in patterns:
@@ -373,14 +377,29 @@ class RuleEngine:
         """Get line number for a character position in content."""
         return content[:position].count('\n') + 1
     
-    def _finding_to_dict(self, finding: Finding) -> Dict[str, Any]:
+    def _finding_to_dict(self, finding: Finding, content: Optional[str] = None) -> Dict[str, Any]:
         """Convert Finding object to dictionary."""
+        # Build small code snippet of +/- 2 lines around the finding
+        snippet = None
+        if content:
+            try:
+                lines = content.split('\n')
+                start_idx = max(0, finding.line_number - 3)
+                end_idx = min(len(lines), finding.line_number + 2)
+                snippet_lines = lines[start_idx:end_idx]
+                snippet = '\n'.join(snippet_lines)
+            except Exception:
+                snippet = None
+
         return {
             'rule_id': finding.rule_id,
             'severity': finding.severity,
             'message': finding.message,
             'line_number': finding.line_number,
+            'line': finding.line_number,
+            'line_no': finding.line_number,
             'line_content': finding.line_content,
+            'code_snippet': snippet,
             'context': finding.context,
             'file_path': str(finding.file_path),
             'language': finding.language,
