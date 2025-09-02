@@ -293,10 +293,15 @@ export default function HomePage() {
                                   )}
                                 </div>
                                 <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">{it.message}</p>
-                                {('code_snippet' in it as any) && (it as any).code_snippet ? (
+                                {('code_snippet' in (it as any)) && (it as any).code_snippet ? (
                                   <pre className="mt-2 text-xs bg-black/80 text-white p-3 rounded-lg overflow-x-auto whitespace-pre-wrap">
                                     {(it as any).code_snippet}
                                   </pre>
+                                ) : null}
+                                {('reasons' in (it as any)) && Array.isArray((it as any).reasons) && (it as any).reasons.length ? (
+                                  <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                    Top signals: {(it as any).reasons.join(', ')}
+                                  </div>
                                 ) : null}
                                 <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-2 font-mono truncate" title={it.file}>
                                   <Folder className="w-3 h-3 flex-shrink-0" />

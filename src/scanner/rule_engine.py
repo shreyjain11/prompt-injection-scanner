@@ -89,6 +89,17 @@ class RuleEngine:
             threshold = max(base_threshold, sev_threshold)
             if f.confidence < threshold:
                 continue
+            # Always apply path-based noise suppression unless dangerous context nearby
+            suffix = file_path.suffix.lower()
+            lines_local = content.split('\n')
+            start_line = max(0, f.line_number - 3)
+            end_line = min(len(lines_local), f.line_number + 3)
+            surrounding = '\n'.join(lines_local[start_line:end_line])
+            in_danger = self.context_analyzer._is_in_dangerous_context(surrounding, language or '')
+            noisy_dirs = { 'assets', 'asset', 'samples', 'sample', 'iso', 'vm', 'images', 'image', 'imgs', 'img' }
+            if any(part.lower() in noisy_dirs for part in file_path.parts):
+                if not in_danger:
+                    continue
             if self.strict:
                 # Strongly filter documentation/data/examples unless clearly dangerous
                 suffix = file_path.suffix.lower()
@@ -381,6 +392,7 @@ class RuleEngine:
         """Convert Finding object to dictionary."""
         # Build small code snippet of +/- 2 lines around the finding
         snippet = None
+        reasons_list = None
         if content:
             try:
                 lines = content.split('\n')
@@ -390,6 +402,17 @@ class RuleEngine:
                 snippet = '\n'.join(snippet_lines)
             except Exception:
                 snippet = None
+        # Extract reasons list from message's appended context, if present
+        try:
+            msg = finding.message or ''
+            if '(Context:' in msg:
+                ctx = msg.split('(Context:', 1)[1].rstrip(')')
+                ctx = ctx.replace('Context:', '').strip()
+                raw = [s.strip() for s in ctx.split(',') if s.strip()]
+                if raw:
+                    reasons_list = raw[:2]
+        except Exception:
+            reasons_list = None
 
         return {
             'rule_id': finding.rule_id,
@@ -400,6 +423,7 @@ class RuleEngine:
             'line_no': finding.line_number,
             'line_content': finding.line_content,
             'code_snippet': snippet,
+            'reasons': reasons_list,
             'context': finding.context,
             'file_path': str(finding.file_path),
             'language': finding.language,
