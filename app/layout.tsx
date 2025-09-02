@@ -7,6 +7,9 @@ import SiteHeader from '@/components/site/header';
 export const metadata: Metadata = {
   title: 'PromptScan - Prompt Injection Scanner',
   description: 'Scan public GitHub repos for prompt injection vulnerabilities. Open source and free forever.',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 const inter = Inter({ subsets: ['latin'] });
