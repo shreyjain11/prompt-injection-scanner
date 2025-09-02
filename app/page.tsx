@@ -116,8 +116,12 @@ export default function HomePage() {
       }
       throw lastError || new Error('All scan endpoints failed');
     } catch (e: any) {
-      const hint = 'Check your deployed API and set NEXT_PUBLIC_API_BASE (e.g., https://your-app.vercel.app).';
-      setError(`${String(e.message || e)} ${hint}`);
+      const msg = String(e?.message || e || '');
+      const isRate = /rate limit/i.test(msg);
+      const hint = isRate
+        ? 'GitHub API rate limit hit. Try again in a minute, add a branch suffix like /tree/main, or set GITHUB_TOKEN on the API server.'
+        : 'Check your deployed API and set NEXT_PUBLIC_API_BASE (e.g., https://your-app.vercel.app).';
+      setError(`${msg} ${hint}`);
     } finally { setLoading(false); }
   }
 
